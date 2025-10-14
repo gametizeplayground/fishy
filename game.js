@@ -29,7 +29,6 @@ class FishingGame {
         this.hookImg = null;
         this.bucketImg = null;
         this.containerImg = null;
-        this.starImg = null;
         
         // Offsets to control hook anchor and rod tip positions
         this.hookOffsetX = 140; // horizontal offset from penguin.x
@@ -106,49 +105,8 @@ class FishingGame {
         this.underwaterLights = [];
         this.initUnderwaterLights();
         
-        // Star system
-        this.stars = [];
-        this.starSpawnCount = 0;
-        this.maxStarsPerDrop = 3;
-        this.showStarPopup = false;
-        this.currentStarQuestion = null;
+        // Game pause flag (no star/questions system)
         this.gamePaused = false;
-        this.starResult = null;
-        this.turnCount = 0; // Track number of turns
-        
-        // Gametize facts for star questions
-        this.gametizeFacts = [
-            {
-                question: "What is Gametize?",
-                options: ["A game development platform", "A fishing game", "A social media app", "A cooking website"],
-                correct: 0,
-                fact: "Gametize is a platform that helps businesses create engaging games and gamified experiences to boost user engagement and loyalty."
-            },
-            {
-                question: "When was Gametize founded?",
-                options: ["2010", "2012", "2015", "2018"],
-                correct: 1,
-                fact: "Gametize was founded in 2012 and has been helping businesses gamify their experiences for over a decade."
-            },
-            {
-                question: "What does Gametize specialize in?",
-                options: ["Video game development", "Gamification solutions", "Mobile app design", "Web development"],
-                correct: 1,
-                fact: "Gametize specializes in gamification solutions, helping businesses create engaging, game-like experiences for their customers and employees."
-            },
-            {
-                question: "Which industry does Gametize serve?",
-                options: ["Only gaming industry", "Multiple industries", "Only tech companies", "Only retail"],
-                correct: 1,
-                fact: "Gametize serves multiple industries including retail, healthcare, education, finance, and more with their gamification solutions."
-            },
-            {
-                question: "What is the main benefit of Gametize's platform?",
-                options: ["Making games", "Increasing user engagement", "Selling products", "Creating websites"],
-                correct: 1,
-                fact: "The main benefit of Gametize's platform is increasing user engagement and loyalty through gamified experiences and interactive challenges."
-            }
-        ];
         
         this.init();
     }
@@ -218,12 +176,7 @@ class FishingGame {
         };
         cImg.src = 'assets/container.png';
 
-        // Load star sprite
-        const sImg = new Image();
-        sImg.onload = () => {
-            this.starImg = sImg;
-        };
-        sImg.src = 'assets/star.png';
+        // Star/question assets removed
 
         this.fishData.forEach((fishInfo, index) => {
             const img = new Image();
@@ -242,32 +195,7 @@ class FishingGame {
             const x = (e.clientX || e.touches[0].clientX) - rect.left;
             const y = (e.clientY || e.touches[0].clientY) - rect.top;
             
-            // Handle star popup clicks
-            if (this.showStarPopup && this.currentStarQuestion) {
-                const popupWidth = 300;
-                const popupHeight = 200;
-                const popupX = (this.canvas.width - popupWidth) / 2;
-                const popupY = (this.canvas.height - popupHeight) / 2;
-                
-                // Check if click is within popup area
-                if (x >= popupX && x <= popupX + popupWidth && 
-                    y >= popupY && y <= popupY + popupHeight) {
-                    
-                    // Check which option was clicked
-                    this.currentStarQuestion.options.forEach((option, index) => {
-                        const optionY = popupY + 80 + (index * 30);
-                        const optionX = popupX + 20;
-                        const optionWidth = popupWidth - 40;
-                        const optionHeight = 25;
-                        
-                        if (x >= optionX && x <= optionX + optionWidth &&
-                            y >= optionY - 15 && y <= optionY + 10) {
-                            this.answerStarQuestion(index);
-                        }
-                    });
-                }
-                return;
-            }
+            // Star/question popup removed
             
             // Check upgrade button (below TAP TO PLAY)
             const buttonX = (this.canvas.width - 120) / 2;
@@ -410,9 +338,7 @@ class FishingGame {
             // drop to 500m below water
             this.hook.targetY = this.waterLevel + this.maxDepthPx;
             
-            // Increment turn count and reset star spawn count for this drop
-            this.turnCount++;
-            this.starSpawnCount = 0;
+            // Star/question counters removed
         }
     }
     
@@ -441,10 +367,7 @@ class FishingGame {
                     this.spawnSingleFish();
                 }
                 
-                // Spawn stars every round when hook is dropping
-                if (this.hook.isDropping) {
-                    this.spawnStar();
-                }
+                // Star spawning removed
             }
         }, 600); // Faster spawning interval
     }
@@ -491,37 +414,13 @@ class FishingGame {
         this.fish.push(fish);
     }
 
-    spawnStar() {
-        // Only spawn star if we haven't reached the limit for this drop
-        if (this.starSpawnCount < this.maxStarsPerDrop && this.hook.isDropping) {
-            const spawnFromLeft = Math.random() < 0.5;
-            const spawnX = spawnFromLeft ? -30 : this.canvas.width + 30;
-            // Spawn in mid to top water levels (first 60% of water depth, not bottom 40%)
-            const maxSpawnDepth = this.maxDepthPx * 0.6; // Only use first 60% of depth
-            const spawnY = this.waterLevel + 20 + Math.random() * maxSpawnDepth;
-            
-            const star = {
-                x: spawnX,
-                y: spawnY,
-                width: 25,
-                height: 25,
-                speed: spawnFromLeft ? 0.8 : -0.8,
-                direction: spawnFromLeft ? 1 : -1,
-                isStar: true,
-                value: 0, // Stars don't give money, they give questions
-                spawnTime: this.ticks
-            };
-            
-            this.stars.push(star);
-            this.starSpawnCount++;
-        }
-    }
+    // Star spawning removed
     
     update() {
         if (!this.gamePaused) {
             this.updateHook();
             this.updateFish();
-            this.updateStars();
+            // Stars removed
             this.checkCollisions();
             this.updateCamera();
             this.updatePopups();
@@ -709,27 +608,7 @@ class FishingGame {
         });
     }
 
-    updateStars() {
-        this.stars.forEach((star, index) => {
-            // Move stars horizontally
-            star.x += star.speed * star.direction;
-            
-            // Add slight vertical movement for floating effect
-            star.y += Math.sin(this.ticks * 0.03 + star.x * 0.01) * 0.5;
-            
-            // Keep stars within water bounds
-            if (star.y < this.waterLevel + 20) {
-                star.y = this.waterLevel + 20;
-            } else if (star.y > this.waterLevel + this.maxDepthPx + 50) {
-                star.y = this.waterLevel + this.maxDepthPx + 50;
-            }
-            
-            // Remove stars that are off screen
-            if (star.x < -100 || star.x > this.canvas.width + 100) {
-                this.stars.splice(index, 1);
-            }
-        });
-    }
+    // Stars update removed
     
     checkCollisions() {
         this.fish.forEach((fish, fishIndex) => {
@@ -767,32 +646,7 @@ class FishingGame {
             }
         });
         
-        // Check for star collisions
-        this.stars.forEach((star, starIndex) => {
-            if (this.hook.isRetracting && !this.showStarPopup) {
-                const hookRect = {
-                    x: this.hook.x - 5,
-                    y: this.hook.y - 5,
-                    width: 10,
-                    height: 10
-                };
-                
-                const starRect = {
-                    x: star.x,
-                    y: star.y,
-                    width: star.width,
-                    height: star.height
-                };
-                
-                if (this.rectCollision(hookRect, starRect)) {
-                    // Remove the star
-                    this.stars.splice(starIndex, 1);
-                    
-                    // Show question popup
-                    this.showStarQuestion();
-                }
-            }
-        });
+        // Star collisions removed
     }
     
     rectCollision(rect1, rect2) {
@@ -802,46 +656,7 @@ class FishingGame {
                rect1.y + rect1.height > rect2.y;
     }
 
-    showStarQuestion() {
-        // Select a random Gametize fact
-        const randomIndex = Math.floor(Math.random() * this.gametizeFacts.length);
-        this.currentStarQuestion = this.gametizeFacts[randomIndex];
-        this.showStarPopup = true;
-        
-        // Pause the game
-        this.gamePaused = true;
-    }
-
-    answerStarQuestion(selectedOption) {
-        const isCorrect = selectedOption === this.currentStarQuestion.correct;
-        
-        if (isCorrect) {
-            // Give bonus money for correct answer
-            this.money += 50;
-            this.updateUI();
-            
-            // Show success popup
-            this.showStarResult(true, this.currentStarQuestion.fact);
-        } else {
-            // Show failure popup
-            this.showStarResult(false, this.currentStarQuestion.fact);
-        }
-        
-        // Reset after a delay
-        setTimeout(() => {
-            this.showStarPopup = false;
-            this.currentStarQuestion = null;
-            this.gamePaused = false;
-        }, 3000);
-    }
-
-    showStarResult(isCorrect, fact) {
-        // This will be handled in the draw function
-        this.starResult = { isCorrect, fact };
-        setTimeout(() => {
-            this.starResult = null;
-        }, 3000);
-    }
+    // Star question/answer logic removed
     
     catchFish(fish) {
         this.money += fish.value;
@@ -911,7 +726,6 @@ class FishingGame {
         this.drawFishingLine();
         this.drawHook();
         this.drawFish();
-        this.drawStars();
         if (this.hook.caughtFish) {
             this.drawCaughtFish();
         }
@@ -922,15 +736,7 @@ class FishingGame {
         // Draw UI elements (not affected by camera)
         this.drawBucketUI();
         
-        // Draw star popup if active
-        if (this.showStarPopup && this.currentStarQuestion) {
-            this.drawStarPopup();
-        }
-        
-        // Draw star result if active
-        if (this.starResult) {
-            this.drawStarResult();
-        }
+        // Star popup/result removed
         
         // Only show upgrade button when start screen is visible
         if (!this.startScreen.classList.contains('hidden')) {
@@ -1344,132 +1150,9 @@ class FishingGame {
         });
     }
 
-    drawStars() {
-        this.stars.forEach(star => {
-            this.ctx.save();
-            this.ctx.translate(star.x + star.width / 2, star.y + star.height / 2);
-            
-            if (this.starImg) {
-                this.ctx.imageSmoothingEnabled = true;
-                this.ctx.imageSmoothingQuality = 'high';
-                this.ctx.drawImage(
-                    this.starImg,
-                    -star.width / 2,
-                    -star.height / 2,
-                    star.width,
-                    star.height
-                );
-            } else {
-                // Fallback star shape
-                this.ctx.fillStyle = '#FFD700';
-                this.ctx.strokeStyle = '#FFA500';
-                this.ctx.lineWidth = 2;
-                
-                // Draw a simple star
-                this.ctx.beginPath();
-                for (let i = 0; i < 5; i++) {
-                    const angle = (i * 4 * Math.PI) / 5;
-                    const x = Math.cos(angle) * (star.width / 2);
-                    const y = Math.sin(angle) * (star.height / 2);
-                    if (i === 0) {
-                        this.ctx.moveTo(x, y);
-                    } else {
-                        this.ctx.lineTo(x, y);
-                    }
-                }
-                this.ctx.closePath();
-                this.ctx.fill();
-                this.ctx.stroke();
-            }
-            
-            this.ctx.restore();
-        });
-    }
+    // drawStars removed
 
-    drawStarPopup() {
-        const ctx = this.ctx;
-        const popupWidth = 300;
-        const popupHeight = 200;
-        const popupX = (this.canvas.width - popupWidth) / 2;
-        const popupY = (this.canvas.height - popupHeight) / 2;
-        
-        // Dark overlay
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Popup background
-        ctx.fillStyle = '#2C3E50';
-        ctx.strokeStyle = '#34495E';
-        ctx.lineWidth = 3;
-        ctx.fillRect(popupX, popupY, popupWidth, popupHeight);
-        ctx.strokeRect(popupX, popupY, popupWidth, popupHeight);
-        
-        // Question text
-        ctx.fillStyle = '#ECF0F1';
-        ctx.font = 'bold 18px DynaPuff, Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.currentStarQuestion.question, popupX + popupWidth / 2, popupY + 40);
-        
-        // Answer options
-        ctx.font = '16px DynaPuff, Arial';
-        this.currentStarQuestion.options.forEach((option, index) => {
-            const optionY = popupY + 80 + (index * 30);
-            const optionX = popupX + 20;
-            const optionWidth = popupWidth - 40;
-            const optionHeight = 25;
-            
-            // Option background
-            ctx.fillStyle = '#34495E';
-            ctx.fillRect(optionX, optionY - 15, optionWidth, optionHeight);
-            
-            // Option text
-            ctx.fillStyle = '#ECF0F1';
-            ctx.textAlign = 'left';
-            ctx.fillText(`${String.fromCharCode(65 + index)}. ${option}`, optionX + 10, optionY);
-            
-            // Make options clickable (this would need event handling)
-            // For now, we'll add click areas that can be handled by the existing click handler
-        });
-        
-        ctx.textAlign = 'center';
-    }
-
-    drawStarResult() {
-        const ctx = this.ctx;
-        const resultWidth = 280;
-        const resultHeight = 120;
-        const resultX = (this.canvas.width - resultWidth) / 2;
-        const resultY = (this.canvas.height - resultHeight) / 2;
-        
-        // Dark overlay
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Result background
-        ctx.fillStyle = this.starResult.isCorrect ? '#27AE60' : '#E74C3C';
-        ctx.strokeStyle = this.starResult.isCorrect ? '#2ECC71' : '#C0392B';
-        ctx.lineWidth = 3;
-        ctx.fillRect(resultX, resultY, resultWidth, resultHeight);
-        ctx.strokeRect(resultX, resultY, resultWidth, resultHeight);
-        
-        // Result text
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 20px DynaPuff, Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(
-            this.starResult.isCorrect ? 'Correct! +$50' : 'Incorrect!',
-            resultX + resultWidth / 2,
-            resultY + 40
-        );
-        
-        // Fact text
-        ctx.font = '14px DynaPuff, Arial';
-        ctx.fillText(
-            this.starResult.fact,
-            resultX + resultWidth / 2,
-            resultY + 80
-        );
-    }
+    // drawStarPopup and drawStarResult removed
     
     gameLoop() {
         this.update();
