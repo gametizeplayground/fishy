@@ -58,14 +58,14 @@ class FishingGame {
         this.fishSprites = [];
         // Fish assets, values, and rarity (sum of rarity = 1)
         this.fishData = [
-            { sprite: 'fish_pink.png', value: 5, rarity: 0.29 },          // common
-            { sprite: 'fish_orange.png', value: 10, rarity: 0.24 },       // common
-            { sprite: 'fish_blue.png', value: 10, rarity: 0.19 },         // common
-            { sprite: 'fish_green.png', value: 15, rarity: 0.12 },        // uncommon
-            { sprite: 'fish_red.png', value: 20, rarity: 0.08 },          // uncommon/rare
-            { sprite: 'fish_blue_skeleton.png', value: 25, rarity: 0.03 },// rare
-            { sprite: 'fish_brown.png', value: 50, rarity: 0.02 },        // very rare
-            { sprite: 'diamond.png', value: 100, rarity: 0.01 }           // extremely rare
+            { sprite: 'fish_pink.webp', value: 5, rarity: 0.29 },          // common
+            { sprite: 'fish_orange.webp', value: 10, rarity: 0.24 },       // common
+            { sprite: 'fish_blue.webp', value: 10, rarity: 0.19 },         // common
+            { sprite: 'fish_green.webp', value: 15, rarity: 0.12 },        // uncommon
+            { sprite: 'fish_red.webp', value: 20, rarity: 0.08 },          // uncommon/rare
+            { sprite: 'fish_blue_skeleton.webp', value: 25, rarity: 0.03 },// rare
+            { sprite: 'fish_brown.webp', value: 50, rarity: 0.02 },        // very rare
+            { sprite: 'diamond.webp', value: 100, rarity: 0.01 }           // extremely rare
         ];
         
         // Water level
@@ -153,7 +153,7 @@ class FishingGame {
         pImg.onload = () => {
             this.penguinImg = pImg;
         };
-        pImg.src = 'assets/penguin.png';
+        pImg.src = 'assets/penguin.webp';
 
         // Load hook sprite
         const hImg = new Image();
